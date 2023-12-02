@@ -3,6 +3,7 @@ import { useRouter } from 'next/router'
 import React, { useState } from 'react'
 
 function ProductForm({
+    _id,
     title:existingTitle,
     description:existingDescription,
     price:existingPrice
@@ -13,11 +14,19 @@ function ProductForm({
     const[goToProductPage,setGoToProductPage] = useState(false)
     const router = useRouter()
 
-    const createProduct=async(e)=>{
+    const creatingOrUpdatingProduct=async(e)=>{
         e.preventDefault()
         const data = {title,description,price}
+       if(_id){
+            //updating the data
+        await axios.put('/api/products',{...data,_id})
+        
+       }
+       else{
+        //creating a new data
         await axios.post('/api/products',data)
-        setGoToProductPage(true)
+       }
+       setGoToProductPage(true)
 
     }
     if(goToProductPage){
@@ -25,7 +34,7 @@ function ProductForm({
     }
   return (
     
-        <form onSubmit={createProduct}>
+        <form onSubmit={creatingOrUpdatingProduct}>
         <div className='flex flex-col gap-2 '>
         
 
