@@ -2,6 +2,8 @@ import axios from 'axios'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React, { useState } from 'react'
+import Spinner from './Spinner'
+import {ReactSortable} from 'react-sortablejs'
 
 function ProductForm({
     _id,
@@ -15,11 +17,12 @@ function ProductForm({
     const[description,setDescription] = useState(existingDescription||'')
     const[price, setPrice] = useState(existingPrice||'')
     const[goToProductPage,setGoToProductPage] = useState(false)
+    const[isUploading,setIsUploading] = useState(false)
     const router = useRouter()
 
     const creatingOrUpdatingProduct=async(e)=>{
         e.preventDefault()
-        const data = {title,description,price}
+        const data = {title,description,price,images}
        if(_id){
             //updating the data
         await axios.put('/api/products',{...data,_id})
@@ -38,6 +41,7 @@ function ProductForm({
 
 
     const uploadImages=async(e)=>{
+      setIsUploading(true)
       const files = e.target?.files
       if(files.length >0){
         const data = new FormData();
@@ -49,6 +53,12 @@ function ProductForm({
           return[...oldImages,...res.data.links]
        })
       }
+      setIsUploading(false)
+    }
+
+
+    const uploadImageOrder =(image)=>{
+      setImages(image)
     }
   return (
     
@@ -68,23 +78,37 @@ function ProductForm({
 
       <label>Photos</label>
       <div className='flex flex-wrap gap-2'>
-        {images?.length && images.map(link=>(
+      <ReactSortable className='flex flex-wrap gap-2' list={images} setList={uploadImageOrder}>
+       
+        {!!images?.length && images.map(link=>(
+           
           <div key={link}  className='border-2  border-gray-300'>
 
-            <img src={link} alt='no' className='w-24 h-23 rounded-lg'/>
+            <img src={link} alt='no' className='w-24 h-24 rounded-lg'/>
           </div>
+          
         ))
         }
+        </ReactSortable>
+        
+        
+
+      {isUploading && (
+            <div className='p-1 h-24 w-24 border-2 border-gray-400 flex items-center'>
+              <Spinner />
+            </div>
+          )}
 
         
         <div>
+         
         <label 
           className='w-24 h-24 border-2 border-gray-400 flex flex-col items-center text-sm text-gray-400 justify-center hover:border-dotted hover:border-blue-900 hover:text-blue-900 hover:cursor-pointer' >
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
               <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
             </svg>
               Upload
-          <input type='file'  className='hidden' onChange={uploadImages}/>
+          <input type='file'  className='hidden' onChange={uploadImages} />
           </label>
           
           </div> 

@@ -8,8 +8,8 @@ export default  async function handle(req,res){
     
     //1-create new product
     if(method==='POST'){
-        const {title,description,price} = req.body
-        const productDoc = await Product.create({title,description,price})
+        const {title,description,price,images} = req.body
+        const productDoc = await Product.create({title,description,price,images})
         res.json(productDoc)
 
     }
@@ -28,8 +28,8 @@ export default  async function handle(req,res){
     //3-updating the product
 
     if(method==='PUT'){
-        const {title,description,price,_id} = req.body
-        await Product.updateOne({_id},{title,description,price})
+        const {title,description,price,images,_id} = req.body
+        await Product.updateOne({_id},{title,description,price,images})
         res.json('Updated ')
         
     }
