@@ -6,6 +6,7 @@ export default  async function handle(req,res){
     const {method} = req;
     await moongooseConnect()
     
+    //1-create new product
     if(method==='POST'){
         const {title,description,price} = req.body
         const productDoc = await Product.create({title,description,price})
@@ -13,6 +14,7 @@ export default  async function handle(req,res){
 
     }
 
+    //2-sending specified product id
     if(method==='GET'){
 
         if(req.query?.id){
@@ -23,6 +25,7 @@ export default  async function handle(req,res){
         }
         
     }
+    //3-updating the product
 
     if(method==='PUT'){
         const {title,description,price,_id} = req.body
@@ -30,7 +33,8 @@ export default  async function handle(req,res){
         res.json('Updated ')
         
     }
-
+    
+    //delete product
     if(method==='DELETE'){
         if(req.query?.id){
             await Product.deleteOne({_id:req.query.id})
