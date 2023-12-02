@@ -1,4 +1,5 @@
 import axios from 'axios'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React, { useState } from 'react'
 
@@ -7,9 +8,10 @@ function ProductForm({
     title:existingTitle,
     description:existingDescription,
     price:existingPrice,
-    images
+    images:existingImages
 }) {
     const[title,setTitle] =useState(existingTitle||'')
+    const[images,setImages] = useState(existingImages || [])
     const[description,setDescription] = useState(existingDescription||'')
     const[price, setPrice] = useState(existingPrice||'')
     const[goToProductPage,setGoToProductPage] = useState(false)
@@ -43,7 +45,9 @@ function ProductForm({
           data.append('file',file)
         }
        const res = await axios.post('/api/upload',data)
-       console.log(res.data)
+       setImages(oldImages=>{
+          return[...oldImages,...res.data.links]
+       })
       }
     }
   return (
@@ -54,7 +58,6 @@ function ProductForm({
 
         
         <label>Product Name</label>
-       
         <input type='text' 
         placeholder='product name' 
         className='sm:max-w-xl '
@@ -62,7 +65,18 @@ function ProductForm({
         onChange={(e)=>setTitle(e.target.value)}
         />
 
-        <label>Photos</label>
+
+      <label>Photos</label>
+      <div className='flex flex-wrap gap-2'>
+        {images?.length && images.map(link=>(
+          <div key={link}  className='border-2  border-gray-300'>
+
+            <img src={link} alt='no' className='w-24 h-23 rounded-lg'/>
+          </div>
+        ))
+        }
+
+        
         <div>
         <label 
           className='w-24 h-24 border-2 border-gray-400 flex flex-col items-center text-sm text-gray-400 justify-center hover:border-dotted hover:border-blue-900 hover:text-blue-900 hover:cursor-pointer' >
@@ -74,6 +88,7 @@ function ProductForm({
           </label>
           
           </div> 
+        </div>
        
 
         
