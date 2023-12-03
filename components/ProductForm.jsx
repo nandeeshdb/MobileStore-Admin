@@ -1,16 +1,18 @@
 import axios from 'axios'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Spinner from './Spinner'
 import {ReactSortable} from 'react-sortablejs'
+import { set } from 'mongoose'
 
 function ProductForm({
     _id,
     title:existingTitle,
     description:existingDescription,
     price:existingPrice,
-    images:existingImages
+    images:existingImages,
+    category:existingCategory
 }) {
     const[title,setTitle] =useState(existingTitle||'')
     const[images,setImages] = useState(existingImages || [])
@@ -18,11 +20,21 @@ function ProductForm({
     const[price, setPrice] = useState(existingPrice||'')
     const[goToProductPage,setGoToProductPage] = useState(false)
     const[isUploading,setIsUploading] = useState(false)
+    const[categogries,setCategories] = useState([])
+    const[category,setCategory] = useState(existingCategory||'')
     const router = useRouter()
+
+
+    useEffect(()=>{
+      axios.get('/api/categories').then(response=>{
+        setCategories(response.data)
+      })
+    })
+
 
     const creatingOrUpdatingProduct=async(e)=>{
         e.preventDefault()
-        const data = {title,description,price,images}
+        const data = {title,description,price,images,category}
        if(_id){
             //updating the data
         await axios.put('/api/products',{...data,_id})
@@ -74,6 +86,17 @@ function ProductForm({
         value={title}
         onChange={(e)=>setTitle(e.target.value)}
         />
+
+
+        <label>Category</label>
+        <select className='sm:max-w-xl' value={category} onChange={(e)=>setCategory(e.target.value)}>
+          <option value="">Select Category</option>
+          {
+            categogries.length > 0 && categogries.map(c=>(
+              <option value={c._id}>{c.name}</option>
+            ))
+          }
+        </select>
 
 
       <label>Photos</label>
