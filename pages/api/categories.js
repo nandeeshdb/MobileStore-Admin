@@ -5,33 +5,31 @@ const { default: Category } = require("@/lib/model/Categories");
 const handle = async(req,res)=>{
     const {method} = req;
     moongooseConnect();
-
-    if(method==='POST'){
-        const {name,parentCategory,properties} = req.body;
-        const categoryDoc = await Category.create({
-            name,
-            parent:parentCategory || undefined,
-            properties
-        })
-        res.json(categoryDoc)
-    }
-
     if(method === "GET"){
         res.json(await Category.find().populate('parent'))
 
     }
 
-    if(method==='PUT'){
-        const{name,parentCategory,properties,_id} = req.body
+    if (method === 'POST') {
+        const {name,parentCategory,properties} = req.body;
+        const categoryDoc = await Category.create({
+          name,
+          parent: parentCategory || undefined,
+          properties,
+        });
+        res.json(categoryDoc);
+      }
+    
+      if (method === 'PUT') {
+        const {name,parentCategory,properties,_id} = req.body;
         const categoryDoc = await Category.updateOne({_id},{
-            name,
-            parent:parentCategory || undefined,
-            properties
-
-        })
-
-        res.json(categoryDoc)
-    }
+          name,
+          parent: parentCategory || undefined,
+          properties,
+        });
+        res.json(categoryDoc);
+      }
+    
 
     if(method==='DELETE'){
         const {_id} = req.query
