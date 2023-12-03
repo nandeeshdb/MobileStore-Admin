@@ -12,7 +12,7 @@ export default function Home() {
      <div>
         <h1>Hello, {session?.user?.name}</h1>
       </div>
-      <div className="flex bg-gray-300 rounded-lg overflow-auto items-center">
+      <div className="flex bg-gray-300 rounded-lg overflow-auto items-center max-sm:hidden">
         <img src={session?.user?.image}
         alt="no"
         className="w-8 h-8"
