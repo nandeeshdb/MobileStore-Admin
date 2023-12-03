@@ -1,8 +1,9 @@
 import Layout from '@/components/Layout'
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
+import { withSwal } from 'react-sweetalert2';
 
-function Categories() {
+export function Categories({swal}) {
     const[name,setName] = useState('')
     const[categories,setCategories] = useState([])
     const[parentCategory,setParentCategory] = useState('')
@@ -40,6 +41,30 @@ function Categories() {
       setEditedCategory(category)
       setName(category.name)
       setParentCategory(category?.parent?._id)
+
+    }
+
+    const deleteCategory=(category)=>{
+      swal.fire({
+        title: 'Are you sure?',
+        text: `Delete ${category.name} category`,
+        showCancelButton:true,
+        cancelButtonText:'Cancel',
+        showConfirmButton:true,
+        confirmButtonText:'Delete',
+        confirmButtonColor:'#d55'
+
+      
+    }).then(async(result) => {
+        
+        //console.log({result})
+        const confirm = result.isConfirmed;
+        if(confirm ){
+          const{_id} = category
+          await axios.delete('/api/categories?_id='+_id)
+          fetchCategory();
+        }
+    })
 
     }
   return (
@@ -85,7 +110,7 @@ function Categories() {
                   <td>{category?.parent?.name}</td>
                   <td className='flex gap-2'>
                     <button className='btn-primary' onClick={()=>editCategory(category)}>Edit</button>
-                    <button className='btn-primary'>Delete</button>
+                    <button className='btn-primary' onClick={()=>deleteCategory(category)}>Delete</button>
                     
                   </td>
                 </tr>
@@ -98,4 +123,11 @@ function Categories() {
   )
 }
 
-export default Categories
+
+
+
+
+export default withSwal(({swal},ref)=>(
+  <Categories swal={swal}/>
+))
+
