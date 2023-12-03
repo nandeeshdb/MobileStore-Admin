@@ -8,6 +8,7 @@ export function Categories({swal}) {
     const[categories,setCategories] = useState([])
     const[parentCategory,setParentCategory] = useState('')
     const[editedCategory,setEditedCategory] = useState(null)
+    const[properties,setProperties] = useState([])
 
 
     useEffect(()=>{
@@ -23,17 +24,30 @@ export function Categories({swal}) {
 
     const saveCategory=async(e)=>{
         e.preventDefault();
-        const data = {name,parentCategory}
+        const data = {name,
+          parentCategory,
+          properties:properties.map(p=>({
+            name:p.name,
+            values:p.values.split(',')
+
+        }))
+        }
         if(editedCategory){
           await axios.put('/api/categories',{...data,_id:editedCategory._id})
           fetchCategory();
           setName('')
           setEditedCategory(null)
+          setProperties([])
+          setParentCategory('')
+          
+          
         }
         else{
           await axios.post('/api/categories',data)
           fetchCategory();
           setName('')
+          setProperties([])
+          setParentCategory('')
         }
     }
 
@@ -41,6 +55,10 @@ export function Categories({swal}) {
       setEditedCategory(category)
       setName(category.name)
       setParentCategory(category?.parent?._id)
+      setProperties(category.properties.map(({name,values})=>({
+        name,
+        values:values.join(',')
+    })))
 
     }
 
@@ -65,8 +83,50 @@ export function Categories({swal}) {
           fetchCategory();
         }
     })
+    }
+
+
+    const addProperty=()=>{
+      setProperties(prev=>{
+        return [...prev,{name:'',values:''}]
+      })
 
     }
+
+
+    const handlePropertyNameChange = (index,property,newName)=>{
+      // console.log({index,property,newName})
+
+      setProperties(prev=>{
+        const propertiess = [...prev]
+        propertiess[index].name = newName;
+        return propertiess
+      })
+
+    }
+    const handlePropertyValueChange = (index,property,newValue)=>{
+      // console.log({index,property,newValue})
+
+      setProperties(prev=>{
+        const propertiess = [...prev]
+        propertiess[index].values = newValue;
+        return propertiess
+      })
+
+    }
+
+   const removeProperty=(index)=>{(
+    setProperties(prev=>{
+      return[...prev].filter((p,pIndex)=>{
+        return pIndex !== index
+      })
+    })
+    
+    )
+
+   }
+
+    // console.log(properties)
   return (
     <Layout>
         <h1 className='font-bold mb-4'>Categories</h1>
@@ -74,8 +134,9 @@ export function Categories({swal}) {
           editedCategory ? `Edit Category ${editedCategory.name}` : ' Add New category '
         }</label>
 
-        <form className='flex gap-2 my-3' onSubmit={saveCategory}>
-            <input 
+        <form  onSubmit={saveCategory}>
+          <div className="flex gap-2 my-3">
+          <input 
             placeholder='category name'
             className='my-0'
             value={name}
@@ -91,10 +152,76 @@ export function Categories({swal}) {
               ))
             }
           </select>
-            <button type='submit' className='btn-primary'>Save</button>
+          </div>
+
+
+          <div className='my-2'>
+            <label className='block mb-4'>Properties</label>
+            <button 
+            className="btn-default text-sm " 
+            type='button'
+            onClick={addProperty}
+            >
+              Add new property
+            </button>
+            {
+              properties.length>0 && properties.map((property,index)=>(
+                <div className='flex gap-2 mt-4 items-center '>
+                <input 
+                type='text' 
+                placeholder=' Name ' 
+                className='mb-0'
+                value={property.name}
+                onChange={e=>handlePropertyNameChange(index,property,e.target.value)}
+                />
+                  <span>=</span>
+                <input 
+                type='text' 
+                className='mb-0'
+                placeholder='Values,with comma separated' 
+                value={property.values}
+                onChange={e=>handlePropertyValueChange(index,property,e.target.value)}
+                />
+                <button
+                type='button'
+                 className="btn-default" 
+                onClick={()=>removeProperty(index)}>Remove</button>
+                </div>
+
+              ))
+            }
+          </div>
+
+          <div className="flex gap-2 ">
+          {
+            editedCategory && (
+              
+                <button 
+                className='btn-default my-3' 
+                type='button'
+                onClick={()=>{
+                  setEditedCategory(null); 
+                  setName(''); 
+                  setParentCategory('')
+                  setProperties([])
+                }
+                }
+                >
+                  Cancel</button>
+
+             
+
+            )
+          }
+        <button type='submit' className='btn-primary my-3 '>Save</button>
+        </div>
+
+        
+           
         </form>
 
-
+        {
+          !editedCategory && (
         <table className='basic'>
           <thead>
             <tr>
@@ -109,8 +236,14 @@ export function Categories({swal}) {
                   <td>{category.name}</td>
                   <td>{category?.parent?.name}</td>
                   <td className='flex gap-2'>
-                    <button className='btn-primary' onClick={()=>editCategory(category)}>Edit</button>
-                    <button className='btn-primary' onClick={()=>deleteCategory(category)}>Delete</button>
+                    <button 
+                      className='btn-primary' 
+                      onClick={()=>editCategory(category)}>
+                        Edit</button>
+                    <button 
+                      className='btn-primary' 
+                      onClick={()=>deleteCategory(category)}>
+                        Delete</button>
                     
                   </td>
                 </tr>
@@ -119,6 +252,10 @@ export function Categories({swal}) {
             
           </tbody>
         </table>
+
+          )
+        }
+
     </Layout>
   )
 }
