@@ -1,10 +1,12 @@
 import Product from "@/lib/model/Product";
 import { moongooseConnect } from "@/lib/mongoose";
+import { isAdminRequest } from "./auth/[...nextauth]";
 
 
 export default  async function handle(req,res){
     const {method} = req;
     await moongooseConnect()
+    await isAdminRequest(req,res)
     
     //1-create new product
     if(method==='POST'){

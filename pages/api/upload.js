@@ -2,7 +2,11 @@
   import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
   import fs from 'fs'
   import mime from'mime-types'
+import { moongooseConnect } from '@/lib/mongoose'
+import {isAdminRequest } from './auth/[...nextauth]'
   const handle = async(req,res)=>{
+    moongooseConnect()
+    await isAdminRequest(req,res)
     const form = new multiparty.Form()
     form.parse(req, async(err,fields,files)=>{
        
