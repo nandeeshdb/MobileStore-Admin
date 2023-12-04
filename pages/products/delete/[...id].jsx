@@ -43,7 +43,7 @@ export default function DeleteProduct(){
             <button 
             onClick={goBack} 
             className="btn-default">No</button>
-            clear
+            
             </div>
             </div>
         </Layout>
