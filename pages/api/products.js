@@ -1,6 +1,6 @@
-import Product from "@/lib/model/Product";
 import { moongooseConnect } from "@/lib/mongoose";
 import { isAdminRequest } from "./auth/[...nextauth]";
+import { Product } from "@/lib/model/Product";
 
 
 export default  async function handle(req,res){
