@@ -21,6 +21,7 @@ function OrdersPage() {
         <thead>
           <tr>
             <td>Date</td>
+            <td>Paid</td>
             <td>Recipient</td>
             <td>Products</td>
           </tr>
@@ -28,8 +29,11 @@ function OrdersPage() {
         <tbody>
           {
             orders.length > 0 && orders.map((order)=>(
-              <tr>
+              <tr className='border border-b-gray-300 '>
                 <td>{(new Date(order.createdAt)).toLocaleString()}</td>
+                {
+                  order.paid ? (<td className='bg-green-300'> Yes</td>) : (<td className='bg-red-300'>No</td>)
+                }
                 <td>{order.name} {order.email} <br/>
                     {order.address} {order.city} <br />
                     {order.country} {order.pincode} <br />
